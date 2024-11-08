@@ -26,19 +26,10 @@ module tt_um_systolicLif (
   reg [7:0] mac_block_One_State;
   
 
-  weight_stationary_Mac mac_block_One(
-    .clk(clk),
-    .reset_n(rst_n),
-    .x_data(ui_in[6:0]),
-    .in_weight(uio_in[6:0]),
-    .accumulate(0),
-    .out_data(uo_out[6:0])
-);
-
-lif one(.current({uo_out[6:0],1'b0}),
+lif one(.current(ui_in),
         .clk(clk),
         .reset_n(rst_n),
-        .state(mac_block_One_State),
+        .state(uo_out),
         .spike(uio_out[7])
     );
 
