@@ -28,6 +28,8 @@ module tt_um_systolicLif (
   wire [6:0] accumalate_Array [6:0];
   reg [6:0] lif_IN [6:0];
 
+  assign accumalate_Array[0] = 7'b0;
+
 genvar i;
 generate 
 for(i = 1; i < 6'd7; i = i + 1) begin 
