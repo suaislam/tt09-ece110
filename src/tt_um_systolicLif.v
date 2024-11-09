@@ -23,15 +23,48 @@ module tt_um_systolicLif (
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, 1'b0};
-  reg [7:0] mac_block_One_State;
-  
+  reg [6:0] mac_block_One_State;
+  reg [0:0] bypass_Mac;
+  wire [6:0] accumalate_Array [6:0];
+  reg [6:0] lif_IN [6:0];
 
-lif one(.current(ui_in),
+genvar i;
+generate 
+for(i = 1; i < 6'd7; i = i + 1) begin 
+    weight_stationary_Mac generated(
+        .clk(clk),
+        .reset_n(rst_n),
+        .x_data(ui_in[6:0]),
+        .in_weight(uio_in[6:0]),
+        .accumulate(accumalate_Array[i]),
+        .out_data(accumalate_Array[i+1]),
+        .selct_IN(bypass_Mac)
+    );
+    always @(*) begin
+        lif_IN[i] = bypass_Mac ? accumalate_Array[i] : 7'b0;
+    end
+    lif one(.current({lif_IN[i],1'b0}),
         .clk(clk),
         .reset_n(rst_n),
         .state(uo_out),
         .spike(uio_out[7])
+   
     );
+end
+
+endgenerate 
+
+// genvar j;
+// generate
+// for (j = 0; j < 7; j = j + 1) begin
+    
+// end
+// endgenerate
+
+
+
+
+
 
 
 endmodule
