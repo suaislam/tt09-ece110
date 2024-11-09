@@ -25,8 +25,12 @@ module tt_um_systolicLif (
   wire _unused = &{ena, 1'b0};
   reg [6:0] mac_block_One_State;
   reg [0:0] bypass_Mac;
-  wire [6:0] accumalate_Array [6:0];
-  reg [6:0] lif_IN [6:0];
+  wire [6:0] accumalate_Array [7:0];
+  reg [6:0] lif_IN [7:0];
+  reg [7:0]   state;
+  reg [7:0] threshold;
+  wire [7:0]  next_state;
+  wire [0:0] spike;
 
   assign accumalate_Array[0] = 7'b0;
 
@@ -45,13 +49,19 @@ for(i = 1; i < 6'd7; i = i + 1) begin
     always @(*) begin
         lif_IN[i] = bypass_Mac ? accumalate_Array[i] : 7'b0;
     end
-    lif one(.current({lif_IN[i],1'b0}),
-        .clk(clk),
-        .reset_n(rst_n),
-        .state(uo_out),
-        .spike(uio_out[7])
-   
-    );
+    assign next_state = lif_IN[i] + (spike ? 0 :(state >> 1));
+    assign spike = (state >= threshold);
+    always @(posedge clk) begin 
+        if (!rst_n) begin 
+            state <= 0;
+            threshold <= 200;
+        end else begin 
+            state <= next_state;
+        end 
+    end 
+
+    
+  
 end
 
 endgenerate 
@@ -63,7 +73,13 @@ endgenerate
 // end
 // endgenerate
 
-
+//   lif one(.current({lif_IN[i],1'b0}),
+//         .clk(clk),
+//         .reset_n(rst_n),
+//         .state(uo_out),
+//         .spike(uio_out[7])
+   
+//     );
 
 
 
